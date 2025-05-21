@@ -20,6 +20,6 @@ using UnityEngine.UI;
         {
             GameManager.Instance.CurrentStage = _stageNumber;
             GameManager.Instance.StageName = _stageName;
-            //
+            MainMenuManager.Instance.ClickedStage(_stageName, _stageColor);
     }
     }
