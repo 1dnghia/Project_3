@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -29,7 +29,7 @@ public class LevelButton : NMonoBehaviour
         MainMenuManager.Instance.LevelOpened -= LevelOpened;
     }
 
-    protected void LevelOpened()
+    protected void LevelOpened() //mở khoá level
     {
         string gameObjectName = gameObject.name;
         string[] parts = gameObjectName.Split('_');

@@ -521,6 +521,8 @@ MonoBehaviour:
   CurrentStage: 0
   CurrentLevel: 0
   StageName: 
+  DefaultLevel: {fileID: 11400000, guid: 9e857b7bdbd0ea045ac4b6e1b70ecbae, type: 2}
+  _allLevels: {fileID: 11400000, guid: aa5010b1dbfa75f46a908be318b93fa2, type: 2}
 --- !u!1001 &146006696
 PrefabInstance:
   m_ObjectHideFlags: 0
