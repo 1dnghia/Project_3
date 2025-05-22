@@ -29,7 +29,7 @@ public class LevelButton : NMonoBehaviour
         MainMenuManager.Instance.LevelOpened -= LevelOpened;
     }
 
-    protected void LevelOpened() //mở khoá level
+    protected void LevelOpened() //đặt màu sắc, mở khoá level và tự động đặt các cấp level trong unity
     {
         string gameObjectName = gameObject.name;
         string[] parts = gameObjectName.Split('_');
