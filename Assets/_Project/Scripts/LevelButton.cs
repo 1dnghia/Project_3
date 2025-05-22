@@ -55,3 +55,4 @@ public class LevelButton : NMonoBehaviour
         GameManager.Instance.CurrentLevel = currentLevel;
         GameManager.Instance.GoToGameplay();
     }
+}
