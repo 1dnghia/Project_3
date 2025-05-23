@@ -6,7 +6,7 @@ using UnityEngine;
 public class LevelData : ScriptableObject
 {
    public string levelName;
-   public List<Edge> Edgs;
+   public List<Edge> Edges;
 }
 
 [System.Serializable]   
