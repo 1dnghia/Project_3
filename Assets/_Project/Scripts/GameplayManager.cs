@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.UI;
 
 public class GameplayManager : NMonoBehaviour
 {
@@ -38,6 +40,63 @@ public class GameplayManager : NMonoBehaviour
         SpawnBoard();
 
         SpawnNodes();
+
+    }
+
+    private void Update()
+    {
+        if (hasGameFinished) return;// Nếu game đã kết thúc thì bỏ qua
+
+        if (Input.GetMouseButtonDown(0))// Khi bắt đầu nhấn chuột
+        {
+            startNode = null;
+            return;
+        }
+
+        if (Input.GetMouseButton(0))// Khi giữ chuột
+        {
+
+            Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            Vector2 mousePos2D = new Vector2(mousePos.x, mousePos.y);
+            RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero);
+
+            if (startNode == null)
+            {// Nếu chưa có node bắt đầu, kiểm tra va chạm
+                if (hit && hit.collider.gameObject.TryGetComponent(out Node tNode)
+                    && tNode.IsClickable)
+                {
+                    startNode = tNode;
+                    _clickHighlight.gameObject.SetActive(true);
+                    _clickHighlight.gameObject.transform.position = (Vector3)mousePos2D;
+                    _clickHighlight.color = GetHighLightColor(tNode.colorId);// Đặt màu highlight
+                }
+
+                return;
+            }
+            // Cập nhật vị trí highlight theo chuột
+            _clickHighlight.gameObject.transform.position = (Vector3)mousePos2D;
+
+            if (hit && hit.collider.gameObject.TryGetComponent(out Node tempNode)
+                && startNode != tempNode)
+            {
+                if (startNode.colorId != tempNode.colorId && tempNode.IsEndNode)
+                {
+                    return;// Không cho kết nối nếu màu khác nhau và là nút cuối
+                }
+
+                startNode.UpdateInput(tempNode);// Cập nhật liên kết giữa node
+                CheckWin();// Kiểm tra thắng
+                startNode = null;
+            }
+
+            return;
+        }
+
+        if (Input.GetMouseButtonUp(0))// Khi thả chuột
+        {
+            startNode = null;
+            _clickHighlight.gameObject.SetActive(false); // Ẩn highlight
+        }
 
     }
 
@@ -86,7 +145,7 @@ public class GameplayManager : NMonoBehaviour
 
                 int colorIdForSpawnedNode = GetColorId(i, j);// Lấy ID màu
 
-                if (colorIdForSpawnedNode != -1)
+                if (colorIdForSpawnedNode != -1)//khi ko có màu đc gán vào
                 {// Gán màu cho node nếu hợp lệ
                     spawnedNode.SetColorForPoint(colorIdForSpawnedNode);
                 }
@@ -106,10 +165,10 @@ public class GameplayManager : NMonoBehaviour
         {
             foreach (var offset in offsetPos)
             {
-                var checkPos = item.Key + offset;
+                var checkPos = item.Key + offset;//item.Key là tọa độ (Vector2Int) của node.
                 if (_nodeGrid.ContainsKey(checkPos))
                 {
-                    item.Value.SetEdge(offset, _nodeGrid[checkPos]);// Gán các cạnh liên kết với node lân cận
+                    item.Value.SetEdge(offset, _nodeGrid[checkPos]);// Gán các cạnh liên kết với node lân cận    //item.Value là đối tượng Node tương ứng tại vị trí đó.
                 }
             }
         }
@@ -139,5 +198,48 @@ public class GameplayManager : NMonoBehaviour
         Color result = NodeColors[colorID % NodeColors.Count];// Lấy màu tương ứng
         result.a = 0.4f;// Đặt độ trong suốt
         return result;
+    }
+
+    private void CheckWin()
+    {
+        bool IsWinning = true;
+
+        foreach (var item in _nodes)
+        {
+            item.SolveHighlight();// Hiển thị hiệu ứng đúng sai
+        }
+
+        foreach (var item in _nodes)
+        {
+            IsWinning &= item.IsWin;// Kiểm tra tất cả node có đúng không
+            if (!IsWinning)
+            {
+                return;
+            }
+        }
+
+        GameManager.Instance.UnlockLevel();
+
+        _winText.gameObject.SetActive(true);
+        _clickHighlight.gameObject.SetActive(false);
+
+        hasGameFinished = true;// Đặt cờ kết thúc game
+    }
+
+    public void ClickedBack()
+    {
+        GameManager.Instance.GoToMainMenu();
+    }
+
+    public void ClickedRestart()
+    {
+        GameManager.Instance.GoToGameplay();
+    }
+
+    public void ClickedNextLevel()
+    {
+        if (!hasGameFinished) return;
+
+        GameManager.Instance.GoToGameplay();
     }
 }

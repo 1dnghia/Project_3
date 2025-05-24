@@ -99,9 +99,9 @@ public class Node : NMonoBehaviour
         }
     }
 
-    public void UpdateInput(Node connectedNode)
+    public void UpdateInput(Node connectedNode)//trung tâm xử lý logic khi người chơi click vào một node để tạo hoặc xóa kết nối giữa các node trong game.
     {
-        // Nếu node được chọn không có kết nối edge tương ứng thì thoát
+        // Kiểm tra xem hai node có thể kết nối không
         if (!ConnectedEdges.ContainsKey(connectedNode))
         {
             return;
@@ -354,7 +354,7 @@ public class Node : NMonoBehaviour
             Vector2Int.up,Vector2Int.left,Vector2Int.down,Vector2Int.right
         };
 
-    public bool IsDegreeThree(List<Node> resultNodes)//Kiểm tra xem node hiện tại có 3 node liên tiếp cùng hàng hoặc cột không
+    public bool IsDegreeThree(List<Node> resultNodes)//Kiểm tra xem node hiện tại có 3 node tạo thành vòng tròn ko
     {
         bool isdegreethree = false;
 
