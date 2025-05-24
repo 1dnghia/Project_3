@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class GameplayManager : MonoBehaviour
+public class GameplayManager : NMonoBehaviour
 {
     [HideInInspector] public bool hasGameFinished;// Biến cờ để kiểm tra game đã kết thúc chưa
 
@@ -23,7 +23,7 @@ public class GameplayManager : MonoBehaviour
     public static GameplayManager Instance => _instance;
     private static GameplayManager _instance;
 
-    private void Awake()
+    protected override void Awake()//hiển thị tên màn khi vào level
     {
         _instance = this;
 
@@ -41,10 +41,10 @@ public class GameplayManager : MonoBehaviour
 
     }
 
-    private void SpawnBoard()
+    protected void SpawnBoard()//sinh bảng
     {
         int currentLevelSize = GameManager.Instance.CurrentStage + 4;
-
+        //Instantiate(...) Là hàm dùng để tạo ra một GameObject mới từ một Prefab có sẵn.
         var board = Instantiate(_boardPrefab,
             new Vector3(currentLevelSize / 2f, currentLevelSize / 2f, 0f),
             Quaternion.identity);// Sinh bảng ở giữa màn hình
@@ -60,14 +60,14 @@ public class GameplayManager : MonoBehaviour
         }
 
         Camera.main.orthographicSize = currentLevelSize + 2f;// Cập nhật camera theo kích thước bảng
-        Camera.main.transform.position = new Vector3(currentLevelSize / 2f, currentLevelSize / 2f, -10f);
+        Camera.main.transform.position = new Vector3(currentLevelSize / 2f, currentLevelSize / 2f, -10f); //di chuyển camera đến giữa bảng
 
         _clickHighlight.size = new Vector2(currentLevelSize / 4f, currentLevelSize / 4f);
         _clickHighlight.transform.position = Vector3.zero;
         _clickHighlight.gameObject.SetActive(false);
     }
 
-    private void SpawnNodes()
+    protected void SpawnNodes()//sinh node
     {
         _nodes = new List<Node>();
         _nodeGrid = new Dictionary<Vector2Int, Node>();
