@@ -5,7 +5,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Level", menuName = "SO/Level")]
 public class LevelData : ScriptableObject
 {
-   public string levelName;
+   public string LevelName;
    public List<Edge> Edges;
 }
 
