@@ -1,15 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
 using TMPro;
 using UnityEngine;
-using static UnityEngine.RuleTile.TilingRuleOutput;
 
 public class LevelGeneratorSingle : MonoBehaviour
 {
     [SerializeField] private TMP_Text _counterText;
     [SerializeField] private int speed;
-
     private int tempCount;
     private int counter;
 

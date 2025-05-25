@@ -1,11 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
 
-public class LevelGenerator : NMonoBehaviour
+public class LevelGenerator : MonoBehaviour
 {
     #region START_METHODS
 
@@ -15,7 +14,7 @@ public class LevelGenerator : NMonoBehaviour
 
     public int levelSize => stage + 4;
 
-    protected override void Awake()
+    private void Awake()
     {
         SpawnBoard();// Tạo bảng nền
         SpawnNodes();// Tạo các node trong bảng
@@ -334,4 +333,3 @@ public struct Point
         return (100 * x + y).GetHashCode(); // Hash theo công thức đơn giản
     }
 }
-

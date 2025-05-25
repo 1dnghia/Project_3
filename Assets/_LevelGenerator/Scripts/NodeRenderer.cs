@@ -1,18 +1,16 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
 using UnityEngine;
 
 public class NodeRenderer : MonoBehaviour
 {
-    [SerializeField] private List<Color> NodeColors;
+    [SerializeField] List<Color> NodeColors;
 
     [SerializeField] private GameObject _point;
     [SerializeField] private GameObject _topEdge;
     [SerializeField] private GameObject _bottomEdge;
     [SerializeField] private GameObject _leftEdge;
     [SerializeField] private GameObject _rightEdge;
-
 
     public void Init()
     {
@@ -25,11 +23,11 @@ public class NodeRenderer : MonoBehaviour
 
     public void SetEdge(int colorId, Point direction)
     {
-        GameObject connectedNode = _point;// Mặc định chọn điểm trung tâm
-                                          // Kiểm tra hướng và gán GameObject tương ứng
+        GameObject connectedNode = _point;
+
         if (direction == Point.up)
         {
-            connectedNode = _topEdge;// Nếu hướng là lên thì chọn cạnh trên
+            connectedNode = _topEdge;
         }
 
         else if (direction == Point.down)
@@ -47,7 +45,7 @@ public class NodeRenderer : MonoBehaviour
             connectedNode = _rightEdge;
         }
 
-        connectedNode.SetActive(true);// Hiện cạnh được chọn
-        connectedNode.GetComponent<SpriteRenderer>().color = NodeColors[colorId % NodeColors.Count];// Lấy SpriteRenderer và gán màu từ danh sách NodeColors, dùng phép chia lấy dư để đảm bảo không vượt quá chỉ số danh sách
+        connectedNode.SetActive(true);
+        connectedNode.GetComponent<SpriteRenderer>().color = NodeColors[colorId % NodeColors.Count];
     }
 }
