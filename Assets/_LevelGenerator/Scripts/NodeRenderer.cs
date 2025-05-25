@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class NodeRenderer : MonoBehaviour
 {
-    [SerializeField] List<Color> NodeColors;
+    [SerializeField] private List<Color> NodeColors;
 
     [SerializeField] private GameObject _point;
     [SerializeField] private GameObject _topEdge;

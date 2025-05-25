@@ -89,17 +89,19 @@ public class LevelGeneratorSingle : MonoBehaviour
     }
 }
 
-public class GridNode
+public class GridNode//Khởi tạo GridData trống, Tạo danh sách toàn bộ điểm trên lưới, sau đó trộn ngẫu nhiên (Shuffle) để tăng tính bất định.
 {
-    public GridNode Prev;
-    public GridData Data;
-    private int neighborIndex, emptyIndex;
-    private List<Point> neighbors, emptyPositions;
+    public GridNode Prev;//Lưu lại bước trước đó để có thể quay lại nếu không còn bước hợp lệ nào tại node hiện tại
+    public GridData Data;//Lưu lại toàn bộ thông tin của lưới tại bước hiện tại
+    private int neighborIndex;//Chỉ số của ô hiện tại trong danh sách neighbors
+    private int emptyIndex;//Chỉ số của ô hiện tại trong danh sách emptyPositions
+    private List<Point> neighbors;//Danh sách ô kề hợp lệ, có thể mở rộng
+    private List<Point> emptyPositions; //Danh sách ô trống hợp lệ, có thể mở rộng
     public GridNode(int LevelSize)
     {
         Prev = null;
         Data = new GridData(LevelSize);
-        neighbors = new List<Point>();
+        neighbors = new List<Point>();  
         emptyPositions = new List<Point>();
         neighborIndex = 0;
         emptyIndex = 0;
@@ -115,8 +117,8 @@ public class GridNode
 
     public GridNode(GridData data, GridNode prev = null)
     {
-        Data = data;
-        Prev = prev;
+        Data = data;//Lưu lại toàn bộ thông tin của lưới tại bước hiện tại
+        Prev = prev;//Quay lại nếu không còn bước hợp lệ nào tại node hiện tại
         neighborIndex = 0;
         emptyIndex = 0;
         neighbors = new List<Point>();
@@ -494,9 +496,9 @@ public class GridData
         }
 
     }
-
+    //***HashSet một kiểu dữ liệu tập hợp trong C# — nó lưu trữ các phần tử duy nhất, không cho phép trùng lặp, và cho phép truy cập, kiểm tra nhanh nhờ sử dụng băm (hashing).
     public static HashSet<Point> FindMinConnectedSet(List<Point> points, List<HashSet<Point>> connectedSet)
-    {
+    {//phân nhóm các điểm rời rạc trong danh sách points thành các cụm (HashSet<Point>), rồi trả về cụm nhỏ nhất, điền các cụm tìm được vào connectedSet
         HashSet<Point> visited = new HashSet<Point>();
         HashSet<Point> allPoints = new HashSet<Point>(points);
 
@@ -505,20 +507,20 @@ public class GridData
             if (!visited.Contains(point))
             {
                 HashSet<Point> connected = new HashSet<Point>();
-                Queue<Point> queue = new Queue<Point>();
+                Queue<Point> queue = new Queue<Point>();//***khởi tạo một hàng đợi (queue) chứa các đối tượng kiểu Point.
 
-                queue.Enqueue(point);
+                queue.Enqueue(point);//***thêm phần tử vào cuối hàng đợi.
 
                 while (queue.Count > 0)
                 {
-                    Point current = queue.Dequeue();
+                    Point current = queue.Dequeue();//***Lấy và loại bỏ phần tử ở đầu hàng đợi.
 
-                    if (!visited.Contains(current))
+                    if (!visited.Contains(current))//kiểm tra xem current đã được thăm chưa, nếu chưa thì thêm vào connected và visited
                     {
                         connected.Add(current);
-                        visited.Add(current);
+                        visited.Add(current);   
 
-                        foreach (var neighbor in GetNeighbors(current))
+                        foreach (var neighbor in GetNeighbors(current))//lấy 4 node point lân cận của current, thhàng đợi queue nếu chưa được thăm và có trong allPoints
                         {
                             if (!visited.Contains(neighbor) && allPoints.Contains(neighbor))
                             {
@@ -545,7 +547,7 @@ public class GridData
         return minSet;
     }
 
-    private static List<Point> GetNeighbors(Point point)
+    private static List<Point> GetNeighbors(Point point)//Trả về danh sách các ô lân cận theo 4 hướng
     {
         List<Point> result = new List<Point>
             {
