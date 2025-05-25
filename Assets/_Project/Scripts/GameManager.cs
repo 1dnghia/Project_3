@@ -41,7 +41,7 @@ public class GameManager : NMonoBehaviour
         Levels = new Dictionary<string, LevelData>();// thêm hết tên level từ _allLevels.Levels vào thư viện Levels
         foreach (var item in _allLevels.Levels)
         {
-            Levels[item.levelName] = item;
+            Levels[item.LevelName] = item;
         }
     }
 
