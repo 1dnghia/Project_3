@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -101,7 +102,7 @@ public class GridNode//Khởi tạo GridData trống, Tạo danh sách toàn b�
     {
         Prev = null;
         Data = new GridData(LevelSize);
-        neighbors = new List<Point>();  
+        neighbors = new List<Point>();
         emptyPositions = new List<Point>();
         neighborIndex = 0;
         emptyIndex = 0;
@@ -201,14 +202,14 @@ public class GridData
     private static Point[] directionChecks = new Point[]
     { Point.up,Point.down,Point.left,Point.right };
 
-    public int[,] _grid;
-    public bool IsSolved;
+    public int[,] _grid;// Mảng 2D lưu trạng thái mỗi ô trong lưới
+    public bool IsSolved;// Cờ đánh dấu lưới đã hoàn chỉnh
     public Point CurrentPos;
     public int ColorId;
     public static int LevelSize;
     public List<Edge> Edges;
 
-    public GridData(int levelSize)
+    public GridData(int levelSize)//tạo lưới mới kích thước levelSize x levelSize, toàn bộ ô = -1 (trống)
     {
         _grid = new int[levelSize, levelSize];
 
@@ -221,12 +222,12 @@ public class GridData
         }
 
         IsSolved = false;
-        ColorId = -1;
+        ColorId = -1;// Chưa chọn màu nào
         LevelSize = levelSize;
         Edges = new List<Edge>();
     }
 
-    public GridData(int i, int j, int passedColor, GridData gridCopy)
+    public GridData(int i, int j, int passedColor, GridData gridCopy)//tạo bản sao của gridCopy, đồng thời đặt điểm (i, j) thành ColorId
     {
         _grid = new int[LevelSize, LevelSize];
 
@@ -346,7 +347,7 @@ public class GridData
         return true;
     }
 
-    public int FlowLength()
+    public int FlowLength()// độ dài của đường đi hiện tại trong lưới
     {
         int result = 0;
         foreach (var item in _grid)
@@ -357,11 +358,11 @@ public class GridData
 
         return result;
     }
-
+    //Phân tích lưới _grid hiện tại và tìm ra các: neighbor(vị trí kế bên điểm đang đi mà có thể đi tiếp),emptyPositions(vị trí trống có thể bắt đầu một đường đi mới)
     public void GetResultsList(List<Point> neighbors, List<Point> emptyPositions)
-    {
+    {//neighbors: danh sách vị trí hàng xóm để mở rộng đường hiện tại, emptyPositions: danh sách vị trí trống để bắt đầu đường mới
         int[,] emptyGrid = new int[LevelSize, LevelSize];
-        for (int i = 0; i < LevelSize; i++)
+        for (int i = 0; i < LevelSize; i++)//Khởi tạo emptyGrid với -1, nghĩa là ô chưa được xét hoặc không phải ô trống
         {
             for (int j = 0; j < LevelSize; j++)
             {
@@ -369,49 +370,49 @@ public class GridData
             }
         }
 
-        for (int i = 0; i < LevelSize; i++)
+        for (int i = 0; i < LevelSize; i++)//Xác định các ô trống và đếm số hàng xóm trống xung quanh
         {
             for (int j = 0; j < LevelSize; j++)
             {
                 if (_grid[i, j] == -1)
                 {
-                    emptyGrid[i, j] = 0;
-                    for (int k = 0; k < directionChecks.Length; k++)
+                    emptyGrid[i, j] = 0;// Gán giá trị 0 tức là đã tìm thấy ô trống
+                    for (int k = 0; k < directionChecks.Length; k++) //Với mỗi ô trống, đếm số lượng ô trống liền kề 4 hướng
                     {
                         Point tempPoint = new Point(directionChecks[k].x + i, directionChecks[k].y + j);
-                        if (IsInsideGrid(tempPoint) && _grid[tempPoint.x, tempPoint.y] == -1)
+                        if (IsInsideGrid(tempPoint) && _grid[tempPoint.x, tempPoint.y] == -1)//// Nếu ô lân cận nằm trong lưới và cũng là ô trống
                         {
-                            emptyGrid[i, j]++;
+                            emptyGrid[i, j]++;// Tăng số đếm ô trống kế bên của ô hiện tại = 1
                         }
                     }
                 }
             }
         }
 
-        List<Point> zeroNeighbours = new List<Point>();
-        List<Point> allNeighbours = new List<Point>();
+        List<Point> zeroNeighbours = new List<Point>();// Danh sách lưu các ô hàng xóm (neighbors) có số hàng xóm trống = 0
+        List<Point> allNeighbours = new List<Point>();//// Danh sách lưu tất cả các ô hàng xóm trống quanh điểm hiện tại
 
-        for (int i = 0; i < directionChecks.Length; i++)
+        for (int i = 0; i < directionChecks.Length; i++)//Tìm các hàng xóm hợp lệ (neighbor)
         {
             Point tempPoint = CurrentPos + directionChecks[i];
             if (IsInsideGrid(tempPoint) &&
                 IsNotNeighbour(tempPoint) &&
-                emptyGrid[tempPoint.x, tempPoint.y] != -1)
+                emptyGrid[tempPoint.x, tempPoint.y] != -1)// Nếu ô nằm trong lưới, chưa phải hàng xóm hiện tại, và là ô trống (emptyGrid != -1)
             {
-                if (emptyGrid[tempPoint.x, tempPoint.y] == 0)
+                if (emptyGrid[tempPoint.x, tempPoint.y] == 0)// Nếu ô trống này không có ô trống nào bên cạnh (count == 0)
                 {
                     zeroNeighbours.Add(tempPoint);
                     emptyGrid[tempPoint.x, tempPoint.y] = -1;
                 }
-                allNeighbours.Add(tempPoint);
+                allNeighbours.Add(tempPoint);// Lưu tất cả hàng xóm trống được tìm thấy
             }
         }
 
-        List<Point> zeroEmpty = new List<Point>();
-        List<Point> oneEmpty = new List<Point>();
-        List<Point> allEmpty = new List<Point>();
+        List<Point> zeroEmpty = new List<Point>();//ô trống không có ô trống bên cạnh
+        List<Point> oneEmpty = new List<Point>();//ô trống chỉ có 1 ô trống bên cạnh
+        List<Point> allEmpty = new List<Point>();//tất cả các ô trống
 
-        for (int i = 0; i < LevelSize; i++)
+        for (int i = 0; i < LevelSize; i++)//Phân loại các ô trống
         {
             for (int j = 0; j < LevelSize; j++)
             {
@@ -432,11 +433,11 @@ public class GridData
             }
         }
 
-        List<HashSet<Point>> connectedSet = new List<HashSet<Point>>();
-        HashSet<Point> minSet = FindMinConnectedSet(new List<Point>(allEmpty), connectedSet);
-        List<HashSet<Point>> tempSet = new List<HashSet<Point>>();
+        List<HashSet<Point>> connectedSet = new List<HashSet<Point>>();// Tìm các vùng liên thông (connected sets) của các ô trống
+        HashSet<Point> minSet = FindMinConnectedSet(new List<Point>(allEmpty), connectedSet);// Tìm vùng liên thông nhỏ nhất (minSet) trong toàn bộ ô trống
+        List<HashSet<Point>> tempSet = new List<HashSet<Point>>();// Lọc lại các vùng liên thông loại bỏ vùng dính vào neighbor hiện tại
 
-        foreach (var item in connectedSet)
+        foreach (var item in connectedSet)//Bỏ qua các vùng liên thông nếu không thể giải được
         {
             bool canAdd = true;
 
@@ -452,12 +453,12 @@ public class GridData
         }
         connectedSet = tempSet;
 
-        if (zeroEmpty.Count > 0 || zeroNeighbours.Count > 1)
+        if (zeroEmpty.Count > 0 || zeroNeighbours.Count > 1) // Nếu có ít nhất 1 ô trống không có ô trống lân cận (zeroEmpty > 0) Hoặc có nhiều hơn 1 ô hàng xóm không có ô trống lân cận (zeroNeighbours > 1)
         {
             return;
         }
 
-        foreach (var item in connectedSet)
+        foreach (var item in connectedSet)// Kiểm tra tính khả giải của từng vùng liên thông còn lại, Nếu có vùng không thể giải (đường đi ≥ 3), thoát hàm luôn
         {
             if (!LevelGeneratorSingle.IsSolvable(item))
             {
@@ -465,22 +466,22 @@ public class GridData
             }
         }
 
-        if (zeroNeighbours.Count == 1)
+        if (zeroNeighbours.Count == 1)// Nếu chỉ có đúng 1 ô hàng xóm không có ô trống bên cạnh, ưu tiên chọn ô đó để mở rộng đường đi
         {
             neighbors.Add(zeroNeighbours[0]);
             return;
         }
 
-        foreach (var item in allNeighbours)
+        foreach (var item in allNeighbours)//// Thêm tất cả các ô hàng xóm trống được tìm thấy vào danh sách neighbor 
         {
             neighbors.Add(item);
         }
 
-        if (FlowLength() < 3) return;
+        if (FlowLength() < 3) return;// Nếu chiều dài đường hiện tại nhỏ hơn 3, không xét đến ô trống bắt đầu đường mới
 
-        if (oneEmpty.Count > 0)
+        if (oneEmpty.Count > 0)// Nếu có ô trống chỉ có 1 hàng xóm trống
         {
-            foreach (var item in oneEmpty)
+            foreach (var item in oneEmpty)// Chỉ thêm những ô nằm trong vùng liên thông nhỏ nhất
             {
                 if (minSet.Contains(item))
                     emptyPositions.Add(item);
@@ -488,7 +489,7 @@ public class GridData
 
             return;
         }
-
+        // Nếu không có ô trống loại trên thì thêm tất cả ô trống nằm trong vùng liên thông nhỏ nhất
         foreach (var item in allEmpty)
         {
             if (minSet.Contains(item))
@@ -518,7 +519,7 @@ public class GridData
                     if (!visited.Contains(current))//kiểm tra xem current đã được thăm chưa, nếu chưa thì thêm vào connected và visited
                     {
                         connected.Add(current);
-                        visited.Add(current);   
+                        visited.Add(current);
 
                         foreach (var neighbor in GetNeighbors(current))//lấy 4 node point lân cận của current, thhàng đợi queue nếu chưa được thăm và có trong allPoints
                         {
