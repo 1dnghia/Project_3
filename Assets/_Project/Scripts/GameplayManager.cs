@@ -54,11 +54,11 @@ public class GameplayManager : NMonoBehaviour
         }
 
         if (Input.GetMouseButton(0))// Khi giữ chuột
-        {
+        { 
 
             Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector2 mousePos2D = new Vector2(mousePos.x, mousePos.y);
-            RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero);
+            RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero);//Raycast2D được dùng để kiểm tra xem chuột đang "đè lên" đối tượng nào trong thế giới 2D.
 
             if (startNode == null)
             {// Nếu chưa có node bắt đầu, kiểm tra va chạm
