@@ -9,29 +9,29 @@ public class LevelGeneratorSingle : MonoBehaviour
     [SerializeField] private TMP_Text _counterText;
     [SerializeField] private int speed;
     private int tempCount;
-    private int counter;
+    private int counter;// Tổng số lần lặp qua các bước trong Generate
 
-    public IEnumerator Generate()//giống như void nhưng sẽ thực hiện được các lệnh yield 
+    public IEnumerator Generate()//thực hiện tạo level theo từng bước, trả lại điều khiển (yield) để không làm đứng game
     {
         counter = 0;
         tempCount = 0;
         var Instance = GetComponent<LevelGenerator>();
         GridNode CurrentNode;
         CurrentNode = new GridNode(Instance.levelSize);
-        CurrentNode = CurrentNode.Next();
-        GridNode nextNode;
+        CurrentNode = CurrentNode.Next();// Di chuyển sang bước tiếp theo của node để bắt đầu mở rộng lưới
+        GridNode nextNode;  
 
-        while (CurrentNode != null)
+        while (CurrentNode != null)// Vòng lặp chính để tiếp tục tạo level
         {
-            if (counter > 5000)
+            if (counter > 5000)// Nếu số bước vượt quá 5000, gọi lại Generate() để làm mới
             {
                 yield return Generate();
                 yield break;
             }
 
-            if (CurrentNode.Data.IsGridComplete())
+            if (CurrentNode.Data.IsGridComplete())// Nếu lưới hiện tại đã hoàn chỉnh
             {
-                Instance.result = CurrentNode.Data;
+                Instance.result = CurrentNode.Data;// Lưu kết quả lưới hoàn chỉnh vào instance
                 yield break;
             }
 
@@ -39,27 +39,27 @@ public class LevelGeneratorSingle : MonoBehaviour
 
             if (nextNode != null)
             {
-                CurrentNode = nextNode;
+                CurrentNode = nextNode;// Nếu có bước tiếp theo hợp lệ thì đi tiếp
             }
             else
             {
-                CurrentNode = CurrentNode.Prev;
-                if (CurrentNode == null) { yield break; }
+                CurrentNode = CurrentNode.Prev;// Nếu không có bước tiếp theo, lùi lại node trước đó để tìm hướng khác
+                if (CurrentNode == null) { yield break; }// Nếu không thể lùi lại nữa (đã về đầu) thì dừng
             }
 
-            Instance.RenderGrid(CurrentNode.Data._grid);
+            Instance.RenderGrid(CurrentNode.Data._grid);// Vẽ lại lưới hiện tại lên màn hình
             counter++;
             tempCount++;
-            _counterText.text = counter.ToString();
-            if (tempCount > speed * Time.deltaTime)
+            _counterText.text = counter.ToString(); // Cập nhật số đếm lên UI
+            if (tempCount > speed * Time.deltaTime)// Nếu đã chạy đủ số bước theo tốc độ đã định, tạm dừng 1 frame
             {
                 tempCount = 0;
-                yield return null;
+                yield return null;// trả lại điều khiển cho Unity, frame tiếp theo sẽ chạy tiếp
             }
         }
     }
 
-    public static bool IsSolvable(HashSet<Point> points)
+    public static bool IsSolvable(HashSet<Point> points)// Hàm kiểm tra tính khả thi của một tập điểm (hashset) để sinh lưới
     {
         if (points.Count < 3) return false;
         if (points.Count == 3) return true;
@@ -68,77 +68,77 @@ public class LevelGeneratorSingle : MonoBehaviour
         GridNode CurrentCheckNode = new GridNode(GridData.LevelSize, points);
         GridNode NextNode;
 
-        while (CurrentCheckNode != null)
+        while (CurrentCheckNode != null)// Dùng vòng lặp để mở rộng từng bước trong GridNode
         {
-            if (CurrentCheckNode.Data.IsGridComplete())
+            if (CurrentCheckNode.Data.IsGridComplete())// Nếu lưới đã hoàn chỉnh thì trả về true
             {
                 return true;
             }
-            NextNode = CurrentCheckNode.Next();
+            NextNode = CurrentCheckNode.Next();// Tạo bước tiếp theo
             if (NextNode != null)
             {
-                CurrentCheckNode = NextNode;
+                CurrentCheckNode = NextNode;// đi tiếp
             }
             else
             {
-                CurrentCheckNode = CurrentCheckNode.Prev;
+                CurrentCheckNode = CurrentCheckNode.Prev;// backtrack nếu không có bước mới
             }
 
         }
 
-        return false;
+        return false;// Nếu hết mà không hoàn chỉnh được thì không khả thi
     }
 }
 
 public class GridNode//Khởi tạo GridData trống, Tạo danh sách toàn bộ điểm trên lưới, sau đó trộn ngẫu nhiên (Shuffle) để tăng tính bất định.
 {
-    public GridNode Prev;//Lưu lại bước trước đó để có thể quay lại nếu không còn bước hợp lệ nào tại node hiện tại
-    public GridData Data;//Lưu lại toàn bộ thông tin của lưới tại bước hiện tại
-    private int neighborIndex;//Chỉ số của ô hiện tại trong danh sách neighbors
-    private int emptyIndex;//Chỉ số của ô hiện tại trong danh sách emptyPositions
+    public GridNode Prev;// Lưu lại node trước đó để hỗ trợ quay lui khi cần
+    public GridData Data;// Lưu trạng thái của lưới tại thời điểm hiện tại
+    private int neighborIndex;// Biến đếm để duyệt qua danh sách neighbors
+    private int emptyIndex;// Biến đếm để duyệt qua danh sách emptyPositions
     private List<Point> neighbors;//Danh sách ô kề hợp lệ, có thể mở rộng
     private List<Point> emptyPositions; //Danh sách ô trống hợp lệ, có thể mở rộng
-    public GridNode(int LevelSize)
+    public GridNode(int LevelSize)//Tạo GridNode mới với lưới trống và danh sách toàn bộ các điểm
     {
         Prev = null;
-        Data = new GridData(LevelSize);
+        Data = new GridData(LevelSize);// Tạo GridData trống với kích thước LevelSize
         neighbors = new List<Point>();
         emptyPositions = new List<Point>();
         neighborIndex = 0;
         emptyIndex = 0;
-        for (int i = 0; i < LevelSize; i++)
+        for (int i = 0; i < LevelSize; i++)// Duyệt toàn bộ các ô trong lưới và thêm vào danh sách emptyPositions
         {
             for (int j = 0; j < LevelSize; j++)
             {
                 emptyPositions.Add(new Point(i, j));
             }
         }
-        Shuffle(emptyPositions);
+        Shuffle(emptyPositions);// Trộn danh sách để đảm bảo tính ngẫu nhiên trong việc chọn ô
     }
-
+    //Tạo GridNode từ một GridData có sẵn và node trước đó (Prev)
     public GridNode(GridData data, GridNode prev = null)
     {
-        Data = data;//Lưu lại toàn bộ thông tin của lưới tại bước hiện tại
-        Prev = prev;//Quay lại nếu không còn bước hợp lệ nào tại node hiện tại
+        Data = data;
+        Prev = prev;
         neighborIndex = 0;
         emptyIndex = 0;
         neighbors = new List<Point>();
         emptyPositions = new List<Point>();
-        Data.GetResultsList(neighbors, emptyPositions);
-        Shuffle(neighbors);
+        Data.GetResultsList(neighbors, emptyPositions);// Lấy ra các ô kề và ô trống hợp lệ từ dữ liệu hiện tại
+        Shuffle(neighbors);// Trộn ngẫu nhiên danh sách để tăng độ bất định
         Shuffle(emptyPositions);
     }
 
-    public GridNode(int levelSize, HashSet<Point> points)
+    public GridNode(int levelSize, HashSet<Point> points)//Khởi tạo với danh sách điểm cụ thể (không tạo toàn bộ lưới)
     {
         Prev = null;
-        Data = new GridData(levelSize, points);
+        Data = new GridData(levelSize, points);// Khởi tạo GridData với các điểm cụ thể
         neighborIndex = 0;
         emptyIndex = 0;
         neighbors = new List<Point>();
         emptyPositions = new List<Point>();
 
-        foreach (var item in points)
+        foreach (var item in points)// Chuyển từ HashSet sang List để có thể duyệt và trộn
         {
             emptyPositions.Add(item);
         }
@@ -147,49 +147,49 @@ public class GridNode//Khởi tạo GridData trống, Tạo danh sách toàn b�
     }
 
 
-    public GridNode Next()
+    public GridNode Next()// Phương thức tạo ra GridNode kế tiếp dựa trên các điểm hợp lệ
     {
-        GridData tempGrid;
+        GridData tempGrid;//Biến tạm để tạo GridData
 
-        if (neighborIndex < neighbors.Count && emptyIndex < emptyPositions.Count)
+        if (neighborIndex < neighbors.Count && emptyIndex < emptyPositions.Count) // Nếu còn ô kề và ô trống
         {
-            if (UnityEngine.Random.Range(0, GridData.LevelSize) != 0)
+            if (UnityEngine.Random.Range(0, GridData.LevelSize) != 0)// Xác suất cao chọn ô kề để mở rộng tiếp vùng hiện tại
             {
-                tempGrid = new GridData(neighbors[neighborIndex].x, neighbors[neighborIndex].y, Data.ColorId, Data);
+                tempGrid = new GridData(neighbors[neighborIndex].x, neighbors[neighborIndex].y, Data.ColorId, Data);// Tạo node mới từ ô kề (giữ nguyên màu)
                 neighborIndex++;
                 return new GridNode(tempGrid, this);
             }
             else
-            {
+            {//Trường hợp ngẫu nhiên chọn ô trống → tạo màu mới.
                 tempGrid = new GridData(emptyPositions[emptyIndex].x, emptyPositions[emptyIndex].y, Data.ColorId + 1, Data);
                 emptyIndex++;
                 return new GridNode(tempGrid, this);
             }
         }
-        else if (neighborIndex < neighbors.Count)
+        else if (neighborIndex < neighbors.Count)// Nếu chỉ còn ô kề→ tiếp tục mở theo đường đi hiện tại.
         {
             tempGrid = new GridData(neighbors[neighborIndex].x, neighbors[neighborIndex].y, Data.ColorId, Data);
             neighborIndex++;
             return new GridNode(tempGrid, this);
         }
-        else if (emptyIndex < emptyPositions.Count)
+        else if (emptyIndex < emptyPositions.Count)// Nếu chỉ còn ô trống→ bắt đầu một đường đi/màu mới.
         {
             tempGrid = new GridData(emptyPositions[emptyIndex].x, emptyPositions[emptyIndex].y, Data.ColorId + 1, Data);
             emptyIndex++;
             return new GridNode(tempGrid, this);
         }
 
-        return null;
+        return null;// Không còn bước đi nào nữa → trả về null
     }
 
-    public static void Shuffle(List<Point> list)
+    public static void Shuffle(List<Point> list)// Hàm trộn danh sách để tạo thứ tự ngẫu nhiên
     {
-        System.Random rng = new System.Random();
+        System.Random rng = new System.Random();// Tạo bộ sinh số ngẫu nhiên
         int n = list.Count;
         while (n > 1)
         {
             n--;
-            int k = rng.Next(n + 1);
+            int k = rng.Next(n + 1);// Chọn chỉ số ngẫu nhiên từ 0 đến n
             var value = list[k];
             list[k] = list[n];
             list[n] = value;
@@ -203,11 +203,11 @@ public class GridData
     { Point.up,Point.down,Point.left,Point.right };
 
     public int[,] _grid;// Mảng 2D lưu trạng thái mỗi ô trong lưới
-    public bool IsSolved;// Cờ đánh dấu lưới đã hoàn chỉnh
+    public bool IsSolved;// Đánh dấu lưới đã giải xong hay chưa
     public Point CurrentPos;
     public int ColorId;
     public static int LevelSize;
-    public List<Edge> Edges;
+    public List<Edge> Edges;// Danh sách các đường đã vẽ
 
     public GridData(int levelSize)//tạo lưới mới kích thước levelSize x levelSize, toàn bộ ô = -1 (trống)
     {
@@ -227,7 +227,7 @@ public class GridData
         Edges = new List<Edge>();
     }
 
-    public GridData(int i, int j, int passedColor, GridData gridCopy)//tạo bản sao của gridCopy, đồng thời đặt điểm (i, j) thành ColorId
+    public GridData(int i, int j, int passedColor, GridData gridCopy)//tạo bản sao từ gridCopy, đồng thời đặt điểm (i, j) thành ColorId
     {
         _grid = new int[LevelSize, LevelSize];
 
@@ -238,7 +238,7 @@ public class GridData
                 _grid[a, b] = gridCopy._grid[a, b];
             }
         }
-
+        // Sao chép danh sách các đường (Edges)
         Edges = new List<Edge>();
 
         foreach (var item in gridCopy.Edges)
@@ -253,11 +253,11 @@ public class GridData
         }
 
         ColorId = gridCopy.ColorId;
-        if (passedColor == ColorId)
+        if (passedColor == ColorId)// Nếu tiếp tục vẽ cùng màu, thêm vào đường hiện tại
         {
             Edges[Edges.Count - 1].Points.Add(new Vector2Int(i, j));
         }
-        else
+        else// Nếu bắt đầu đường mới
         {
             Edges.Add(new Edge()
             {
@@ -271,7 +271,7 @@ public class GridData
         IsSolved = false;
     }
 
-    public GridData(int levelSize, HashSet<Point> points)
+    public GridData(int levelSize, HashSet<Point> points)//Khởi tạo lưới có sẵn các ô hợp lệ, các ô còn lại bị khóa (-2)
     {
         _grid = new int[levelSize, levelSize];
 
@@ -279,13 +279,13 @@ public class GridData
         {
             for (int j = 0; j < levelSize; j++)
             {
-                _grid[i, j] = -2;
+                _grid[i, j] = -2;//-2 là ô bị khóa (không dùng)
             }
         }
 
         foreach (var point in points)
         {
-            _grid[point.x, point.y] = -1;
+            _grid[point.x, point.y] = -1;// các ô hợp lệ được đánh dấu là trống
         }
 
         IsSolved = false;
@@ -294,12 +294,12 @@ public class GridData
         Edges = new List<Edge>();
     }
 
-    public bool IsInsideGrid(Point pos)
+    public bool IsInsideGrid(Point pos)// Kiểm tra một điểm có nằm trong biên lưới hay không
     {
         return pos.IsPointValid(LevelSize);
     }
 
-    public bool IsGridComplete()
+    public bool IsGridComplete()// Kiểm tra lưới đã hoàn thành chưa (không còn ô trống và mỗi màu >= 3 ô)
     {
         foreach (var item in _grid)
         {
@@ -324,7 +324,7 @@ public class GridData
         return true;
     }
 
-    public bool IsNotNeighbour(Point pos)
+    public bool IsNotNeighbour(Point pos)// Kiểm tra điểm pos có phải là hàng xóm hợp lệ (không trùng các điểm cũ)
     {
 
         for (int i = 0; i < LevelSize; i++)
@@ -347,7 +347,7 @@ public class GridData
         return true;
     }
 
-    public int FlowLength()// độ dài của đường đi hiện tại trong lưới
+    public int FlowLength()// Tính độ dài đường đi hiện tại
     {
         int result = 0;
         foreach (var item in _grid)

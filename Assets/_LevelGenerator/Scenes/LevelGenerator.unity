@@ -420,7 +420,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _counterText: {fileID: 1216570525}
-  speed: 1
+  speed: 1000
 --- !u!114 &614429577
 MonoBehaviour:
   m_ObjectHideFlags: 0

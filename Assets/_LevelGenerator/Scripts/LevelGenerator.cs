@@ -211,14 +211,14 @@ public class LevelGenerator : MonoBehaviour
             currentColor = grid[item.Key]; // Lấy màu tại điểm
             numOfConnectedNodes = 0;
 
-            if (currentColor != -1) // Nếu có màu
+            if (currentColor != -1) // Nếu node không phải là ô trống
             {
                 foreach (var direction in directions) // Duyệt 4 hướng
                 {
                     if (grid.ContainsKey(item.Key + direction) &&
-                        grid[item.Key + direction] == currentColor) // Nếu node liền kề cùng màu
+                        grid[item.Key + direction] == currentColor) 
                     {
-                        item.Value.SetEdge(currentColor, direction); // Thiết lập cạnh
+                        item.Value.SetEdge(currentColor, direction); // Nếu lân cận có cùng màu → vẽ cạnh nối
                         numOfConnectedNodes++; // Tăng đếm
                     }
                 }
@@ -237,7 +237,7 @@ public class LevelGenerator : MonoBehaviour
             Point.up, Point.left, Point.down, Point.right // Hướng liền kề
     };
 
-    public void RenderGrid(int[,] grid)
+    public void RenderGrid(int[,] grid)//Giống bản Dictionary, nhưng dùng mảng 2D để truy cập theo [i, j].
     {
         int currentColor;
         int numOfConnectedNodes;
