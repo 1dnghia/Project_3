@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class LevelGeneratorSingle : MonoBehaviour
+public class LevelGeneratorSingle : NMonoBehaviour
 {
     [SerializeField] private TMP_Text _counterText;
     [SerializeField] private int speed;

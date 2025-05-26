@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NodeRenderer : MonoBehaviour
+public class NodeRenderer : NMonoBehaviour
 {
     [SerializeField] private List<Color> NodeColors;
 

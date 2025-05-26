@@ -4,7 +4,7 @@ using TMPro;
 using UnityEditor;
 using UnityEngine;
 
-public class LevelGenerator : MonoBehaviour
+public class LevelGenerator : NMonoBehaviour
 {
     #region START_METHODS
 
@@ -14,7 +14,7 @@ public class LevelGenerator : MonoBehaviour
 
     public int levelSize => stage + 4;
 
-    private void Awake()
+    protected override void Awake()
     {
         SpawnBoard();// Tạo bảng nền
         SpawnNodes();// Tạo các node trong bảng
