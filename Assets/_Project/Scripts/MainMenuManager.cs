@@ -20,10 +20,12 @@ public class MainMenuManager : NMonoBehaviour
     [HideInInspector] public Color CurrentColor;
 
     public UnityAction LevelOpened;
+    private SoundManager _soundManager;
 
     protected override void Awake()
     {
         _instance = this;
+        _soundManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<SoundManager>();
 
         _titlePanel.SetActive(true);
         _stagePanel.SetActive(false);
@@ -32,16 +34,19 @@ public class MainMenuManager : NMonoBehaviour
 
     public void ClickedPlay()
     {
+        _soundManager.PlaySFX(_soundManager.connectClip);
         _titlePanel.SetActive(false);
         _stagePanel.SetActive(true);
     }
     public void ClickedBackToTitle()
     {
+        _soundManager.PlaySFX(_soundManager.connectClip);
         _stagePanel.SetActive(false);
         _titlePanel.SetActive(true);
     }
     public void ClickedBackToStage()
     {
+        _soundManager.PlaySFX(_soundManager.connectClip);
         _levelPanel.SetActive(false);
         _stagePanel.SetActive(true);
     }

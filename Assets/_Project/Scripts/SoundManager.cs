@@ -7,6 +7,13 @@ public class SoundManager : NMonoBehaviour
     private static SoundManager _instance;
     public static SoundManager Instance => _instance;
 
+    public AudioSource MusicAudioSource;
+    public AudioSource SFXAudioSource;
+
+    public AudioClip musicClip;
+    public AudioClip connectClip;
+    public AudioClip winClip;
+
     protected override void Awake()
     {
         if (Instance == null)
@@ -20,11 +27,17 @@ public class SoundManager : NMonoBehaviour
             Destroy(gameObject);
         }
     }
-
-    [SerializeField] private AudioSource _effectSource;
-
-    public void PlaySound(AudioClip clip)
+    
+    protected override void Start()
     {
-        _effectSource.PlayOneShot(clip);
+        MusicAudioSource.clip = musicClip;
+        MusicAudioSource.loop = true;
+        MusicAudioSource.Play();
+    }
+
+    public void PlaySFX(AudioClip sfxClip)
+    {
+        SFXAudioSource.clip = sfxClip;
+        SFXAudioSource.PlayOneShot(sfxClip);
     }
 }

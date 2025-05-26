@@ -18,6 +18,7 @@ public class GameplayManager : NMonoBehaviour
     private LevelData CurrentLevelData;
     private List<Node> _nodes;
     private Node startNode;
+    private SoundManager _soundManager;
 
     public Dictionary<Vector2Int, Node> _nodeGrid;// Bảng node theo vị trí 2D
     public List<Color> NodeColors;
@@ -36,6 +37,7 @@ public class GameplayManager : NMonoBehaviour
             " - " + GameManager.Instance.CurrentLevel.ToString();
 
         CurrentLevelData = GameManager.Instance.GetLevel();
+        _soundManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<SoundManager>();
 
         SpawnBoard();
 
@@ -85,6 +87,7 @@ public class GameplayManager : NMonoBehaviour
                 }
 
                 startNode.UpdateInput(tempNode);// Cập nhật liên kết giữa node
+                _soundManager.PlaySFX(_soundManager.connectClip);
                 CheckWin();// Kiểm tra thắng
                 startNode = null;
             }
@@ -222,17 +225,20 @@ public class GameplayManager : NMonoBehaviour
 
         _winText.gameObject.SetActive(true);
         _clickHighlight.gameObject.SetActive(false);
+        _soundManager.PlaySFX(_soundManager.winClip);
 
         hasGameFinished = true;// Đặt cờ kết thúc game
     }
 
     public void ClickedBack()
     {
+        _soundManager.PlaySFX(_soundManager.connectClip);
         GameManager.Instance.GoToMainMenu();
     }
 
     public void ClickedRestart()
     {
+        _soundManager.PlaySFX(_soundManager.connectClip);
         GameManager.Instance.GoToGameplay();
     }
 
@@ -240,6 +246,7 @@ public class GameplayManager : NMonoBehaviour
     {
         if (!hasGameFinished) return;
 
+        _soundManager.PlaySFX(_soundManager.connectClip);
         GameManager.Instance.GoToGameplay();
     }
 }

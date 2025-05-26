@@ -13,10 +13,12 @@ public class LevelButton : NMonoBehaviour
 
     private bool isLevelUnlocked;
     private int currentLevel;
+    private SoundManager _soundManager;
 
     protected override void Awake()
     {
         _button.onClick.AddListener(Clicked);
+        _soundManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<SoundManager>();
     }
 
     protected override void OnEnable()
@@ -52,6 +54,7 @@ public class LevelButton : NMonoBehaviour
         if (!isLevelUnlocked)
             return;
 
+        _soundManager.PlaySFX(_soundManager.connectClip);
         GameManager.Instance.CurrentLevel = currentLevel;
         GameManager.Instance.GoToGameplay();
     }
